@@ -514,35 +514,6 @@
     <div class="days-grid" id="daysGrid"></div>
   </main>
 
-  <!-- 📅 每日各分類預算設定彈窗 -->
-  <div class="modal" id="dailyBudgetModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>📅 每日「各分類」預算設定</h3>
-        <button class="close-btn" onclick="closeDailyBudgetModal()">&times;</button>
-      </div>
-      
-      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
-        填寫您每天各分類的預算金額，系統會根據本月天數（<span id="dailyDaysCount" style="font-weight: bold; color: var(--text-main);">31</span> 天）自動計算本月總預算：
-      </p>
-
-      <div id="dailyCatBudgetInputs"></div>
-
-      <div class="calc-box">
-        <div class="calc-row">
-          <span>每日預算合計：</span>
-          <span id="sumDailyTotal">$0 / 天</span>
-        </div>
-        <div class="calc-row" style="margin-top: 4px;">
-          <span>自動計算本月總預算：</span>
-          <span id="sumMonthlyTotal" style="color: var(--green-text); font-size: 0.95rem;">$0</span>
-        </div>
-      </div>
-
-      <button class="btn-submit" onclick="applyDailyCatBudgets()">套用為本月總預算</button>
-    </div>
-  </div>
-
   <!-- 所有分類預算餘額總覽彈窗 -->
   <div class="modal" id="balanceOverviewModal">
     <div class="modal-content">
