@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <title>記帳 App</title>
-<link rel="apple-touch-icon" href="icon.jpg">
-<link rel="icon" type="image/jpeg" href="icon.jpg">
+  <link rel="apple-touch-icon" href="icon.jpg">
+  <link rel="icon" type="image/jpeg" href="icon.jpg">
   <style>
     :root {
       /* 鮮明柔和奶黃色調 */
@@ -32,7 +32,6 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* 強制禁止頁面橫向滾動溢出 */
     html, body {
       width: 100vw;
       max-width: 100vw;
@@ -43,7 +42,6 @@
       min-height: 100vh;
     }
 
-    /* 可愛彈跳動畫 */
     @keyframes bounceIn {
       0% { transform: scale(0.92); opacity: 0; }
       70% { transform: scale(1.02); opacity: 1; }
@@ -109,10 +107,6 @@
       width: 100%;
     }
 
-    .summary-item {
-      overflow: hidden;
-    }
-
     .summary-item .label {
       font-size: 0.65rem;
       color: var(--text-muted);
@@ -142,8 +136,8 @@
       color: var(--text-main);
       border: 1.5px solid var(--accent-yellow);
       border-radius: 8px;
-      padding: 4px 8px;
-      font-size: 0.72rem;
+      padding: 4px 6px;
+      font-size: 0.7rem;
       font-weight: 800;
       cursor: pointer;
       white-space: nowrap;
@@ -211,7 +205,6 @@
       color: var(--text-main);
     }
 
-    /* 日曆格內的文字標籤容器 */
     .day-text-badges {
       display: flex;
       flex-direction: column;
@@ -221,7 +214,6 @@
       overflow: hidden;
     }
 
-    /* 分類文字標籤 */
     .day-text-badge {
       font-size: 0.52rem;
       color: #ffffff;
@@ -329,7 +321,6 @@
       font-weight: bold;
     }
 
-    /* Form Elements */
     .form-group {
       margin-bottom: 10px;
     }
@@ -369,7 +360,6 @@
       transform: scale(0.97);
     }
 
-    /* Category Pill */
     .cat-pill {
       display: inline-flex;
       align-items: center;
@@ -381,7 +371,6 @@
       font-weight: 800;
     }
 
-    /* Expense List in Modal */
     .expense-list {
       margin-top: 12px;
       border-top: 2px dashed var(--border-color);
@@ -431,7 +420,6 @@
       background: #fff;
     }
 
-    /* 分類預算餘額卡片樣式 */
     .balance-card {
       background: #fff;
       border: 1.5px solid var(--border-color);
@@ -469,6 +457,23 @@
       border-radius: 4px;
       transition: width 0.3s ease;
     }
+
+    .calc-box {
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 12px;
+    }
+
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--text-main);
+      font-weight: 800;
+    }
   </style>
 </head>
 <body>
@@ -496,8 +501,9 @@
     </div>
 
     <div class="header-actions">
-      <button class="btn-secondary" onclick="openBalanceOverviewModal()">📊 所有預算餘額</button>
-      <button class="btn-secondary" onclick="openBudgetModal()">⚙️ 設定預算</button>
+      <button class="btn-secondary" onclick="openDailyBudgetModal()">📅 每日分類預算</button>
+      <button class="btn-secondary" onclick="openBalanceOverviewModal()">📊 預算餘額</button>
+      <button class="btn-secondary" onclick="openBudgetModal()">⚙️ 各類月預算</button>
     </div>
   </header>
 
@@ -507,6 +513,35 @@
     </div>
     <div class="days-grid" id="daysGrid"></div>
   </main>
+
+  <!-- 📅 每日各分類預算設定彈窗 -->
+  <div class="modal" id="dailyBudgetModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📅 每日「各分類」預算設定</h3>
+        <button class="close-btn" onclick="closeDailyBudgetModal()">&times;</button>
+      </div>
+      
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
+        填寫您每天各分類的預算金額，系統會根據本月天數（<span id="dailyDaysCount" style="font-weight: bold; color: var(--text-main);">31</span> 天）自動計算本月總預算：
+      </p>
+
+      <div id="dailyCatBudgetInputs"></div>
+
+      <div class="calc-box">
+        <div class="calc-row">
+          <span>每日預算合計：</span>
+          <span id="sumDailyTotal">$0 / 天</span>
+        </div>
+        <div class="calc-row" style="margin-top: 4px;">
+          <span>自動計算本月總預算：</span>
+          <span id="sumMonthlyTotal" style="color: var(--green-text); font-size: 0.95rem;">$0</span>
+        </div>
+      </div>
+
+      <button class="btn-submit" onclick="applyDailyCatBudgets()">套用為本月總預算</button>
+    </div>
+  </div>
 
   <!-- 所有分類預算餘額總覽彈窗 -->
   <div class="modal" id="balanceOverviewModal">
@@ -523,11 +558,11 @@
   <div class="modal" id="budgetModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>🎨 各分類每月預算設定</h3>
+        <h3>🎨 各分類每月總預算設定</h3>
         <button class="close-btn" onclick="closeBudgetModal()">&times;</button>
       </div>
       <div id="catBudgetInputs"></div>
-      <button class="btn-submit" style="margin-top:12px;" onclick="saveCatBudgets()">儲存分類預算</button>
+      <button class="btn-submit" style="margin-top:12px;" onclick="saveCatBudgets()">儲存每月總預算</button>
     </div>
   </div>
 
@@ -569,19 +604,23 @@
       "額外消費": "#64748b",
       "玩樂": "#a855f7",
       "禮物": "#ec4899",
-      "電子": "#0284c7",
+      "電子產品": "#0284c7",
       "旅行": "#f59e0b",
       "日用": "#10b981",
       "打鼓": "#ef4444",
       "興趣班": "#6366f1"
     };
 
-    let currentDate = new Date(2026, 7, 1); // 2026 年 8 月
+    let currentDate = new Date(2026, 7, 1);
     let selectedDateStr = "";
 
-    // 預設將所有分類預算皆設置為 0
-    let db = JSON.parse(localStorage.getItem('cream_budget_app_data_v6')) || {
+    let db = JSON.parse(localStorage.getItem('cream_budget_app_data_v7')) || {
       catBudgets: {
+        "飲食": 0, "交通": 0, "額外消費": 0, "玩樂": 0,
+        "禮物": 0, "電子產品": 0, "旅行": 0, "日用": 0,
+        "打鼓": 0, "興趣班": 0
+      },
+      dailyCatBudgets: {
         "飲食": 0, "交通": 0, "額外消費": 0, "玩樂": 0,
         "禮物": 0, "電子產品": 0, "旅行": 0, "日用": 0,
         "打鼓": 0, "興趣班": 0
@@ -590,7 +629,7 @@
     };
 
     function saveData() {
-      localStorage.setItem('cream_budget_app_data_v6', JSON.stringify(db));
+      localStorage.setItem('cream_budget_app_data_v7', JSON.stringify(db));
     }
 
     function getMonthKey(date) {
@@ -691,6 +730,73 @@
         `;
         daysGrid.appendChild(cell);
       }
+    }
+
+    /* 📅 每日各分類預算設定邏輯 */
+    function openDailyBudgetModal() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      document.getElementById('dailyDaysCount').innerText = `${daysInMonth}`;
+      
+      const container = document.getElementById('dailyCatBudgetInputs');
+      container.innerHTML = '';
+
+      Object.keys(CATEGORIES).forEach(cat => {
+        const val = (db.dailyCatBudgets && db.dailyCatBudgets[cat]) || 0;
+        const color = CATEGORIES[cat];
+        const row = document.createElement('div');
+        row.className = 'cat-budget-row';
+        row.innerHTML = `
+          <span class="cat-pill" style="background:${color};">${cat}</span>
+          <div>每天 $<input type="number" data-daily-cat="${cat}" value="${val}" oninput="calcDailyCatTotals()"></div>
+        `;
+        container.appendChild(row);
+      });
+
+      calcDailyCatTotals();
+      document.getElementById('dailyBudgetModal').classList.add('active');
+    }
+
+    function closeDailyBudgetModal() {
+      document.getElementById('dailyBudgetModal').classList.remove('active');
+    }
+
+    function calcDailyCatTotals() {
+      const inputs = document.querySelectorAll('#dailyCatBudgetInputs input');
+      let sumDaily = 0;
+      inputs.forEach(input => {
+        sumDaily += parseFloat(input.value) || 0;
+      });
+
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const sumMonthly = sumDaily * daysInMonth;
+
+      document.getElementById('sumDailyTotal').innerText = `$${Math.round(sumDaily).toLocaleString()} / 天`;
+      document.getElementById('sumMonthlyTotal').innerText = `$${Math.round(sumMonthly).toLocaleString()}`;
+    }
+
+    function applyDailyCatBudgets() {
+      const inputs = document.querySelectorAll('#dailyCatBudgetInputs input');
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      if (!db.dailyCatBudgets) db.dailyCatBudgets = {};
+
+      inputs.forEach(input => {
+        const cat = input.getAttribute('data-daily-cat');
+        const dailyVal = parseFloat(input.value) || 0;
+        db.dailyCatBudgets[cat] = dailyVal;
+        db.catBudgets[cat] = Math.round(dailyVal * daysInMonth);
+      });
+
+      saveData();
+      closeDailyBudgetModal();
+      renderApp();
     }
 
     function openBalanceOverviewModal() {
@@ -858,4 +964,3 @@
   </script>
 </body>
 </html>
-
